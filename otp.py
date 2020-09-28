@@ -1,10 +1,11 @@
 
+from sys import byteorder
 import argparse
 import random
-from sys import byteorder
+import string
+import time
 
-
-def encrypt(keyFile, plaintextFile, ciphertextFile):
+def encrypt(keyFile, plaintextFile, ciphertextFile, output=True):
     """
     Use XOR to encrypt plaintext using a key
 
@@ -37,11 +38,12 @@ def encrypt(keyFile, plaintextFile, ciphertextFile):
 
     with open(ciphertextFile, "w") as f:
         f.write(result)
-    
-    print("Plaintext:  " + str(plaintext))
-    print("Key:        " + str(key))
-    print("Ciphertext: " + str(result))
-    print("Output written to " + ciphertextFile)
+
+    if(output):
+        print("Plaintext:  " + str(plaintext))
+        print("Key:        " + str(key))
+        print("Ciphertext: " + str(result))
+        print("Output written to " + ciphertextFile)
 
 
 def decrypt(keyFile, ciphertextFile, resultFile):
@@ -86,7 +88,7 @@ def decrypt(keyFile, ciphertextFile, resultFile):
 
 
 # Generate a random key of a given length, then write to a file
-def keygen(length, file):
+def keygen(length, file, output=True):
     """
     Generate a random key 
 
@@ -102,8 +104,55 @@ def keygen(length, file):
     with open(file, "w") as f:
         f.write(keyBitString)
 
-    print("Key generated: " + keyBitString)
-    print("Key written to " + file)
+    if(output):
+        print("Key generated: " + keyBitString)
+        print("Key written to " + file)
+
+
+def keygentest():
+    """
+    Generate 20000 3-bit keys, and calculate the frequency distrobution.
+    """
+    length = 3
+    keys = []
+    for _ in range (0, 20000):
+        key = str(format(random.getrandbits(length), "b").zfill(length))
+        keys.append(key)
+
+    print("Key Generation Counts:")
+    print("000: " + str(keys.count("000")))
+    print("001: " + str(keys.count("001")))
+    print("010: " + str(keys.count("010")))
+    print("011: " + str(keys.count("011")))
+    print("100: " + str(keys.count("100")))
+    print("101: " + str(keys.count("101")))
+    print("110: " + str(keys.count("110")))
+    print("111: " + str(keys.count("111")))
+
+
+def enctest():
+    """
+    Create 1000 random 128-bit keys and plaintext examples, then measure the average time
+    that it takes to encrypt each example.
+    """
+    times = []
+
+    for _ in range(0, 5000):
+        # Generate a random key and plaintext for testing purposes
+        keygen(128, "./data/testkey.txt", output=False)
+
+        with open("./data/testplaintext.txt", "w") as f:
+            f.write(''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase, k=16)))
+
+        # With the generated test values, run the encryption function and time how long it takes to complete
+        start = time.time()
+        encrypt("./data/testkey.txt", "./data/testplaintext.txt", "./data/testciphertext.txt", output=False)
+        end = time.time()
+        times.append(end-start)
+
+    # Calculate and print the average running time, in milliseconds
+    print("5000 128-bit encryptions run.")
+    print("Average running time: " + str(round((sum(times) / len(times)) * 1000, 4)) + " milliseconds")
 
 
 # Main function
@@ -116,6 +165,9 @@ if __name__ == "__main__":
     enc_parser = subparsers.add_parser("enc")
     dec_parser = subparsers.add_parser("dec")
     key_parser = subparsers.add_parser("keygen")
+    keygentest_parser = subparsers.add_parser("keygentest")
+    enctest_parser = subparsers.add_parser("enctest")
+
 
     enc_parser.add_argument("key", help="Key file")
     enc_parser.add_argument("plaintext", help="Plaintext file")
@@ -139,4 +191,7 @@ if __name__ == "__main__":
         decrypt(args.key, args.ciphertext, args.result)
     elif (args.command == "keygen"):
         keygen(args.length, args.file)
-
+    elif (args.command == "keygentest"):
+        keygentest()
+    elif (args.command == "enctest"):
+        enctest()
