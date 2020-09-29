@@ -87,10 +87,9 @@ def decrypt(keyFile, ciphertextFile, resultFile):
         f.write(resultAscii)
 
 
-# Generate a random key of a given length, then write to a file
 def keygen(length, file, output=True):
     """
-    Generate a random key 
+    Generate a random key of a given length, then write to a file
 
     @param length: The length of the key, in bits
     @param file: The output file where the key is written
