@@ -119,20 +119,37 @@ def keygentest():
         key = str(format(random.getrandbits(length), "b").zfill(length))
         keys.append(key)
 
+    print("20000 3-bit keys generated.")
+    avg = 20000/8
+    print("Theoretical Average count for each value: " + str(int(avg)))
+
+    keyData = [
+        keys.count("000"),
+        keys.count("001"),
+        keys.count("010"),
+        keys.count("011"),
+        keys.count("100"),
+        keys.count("101"),
+        keys.count("110"),
+        keys.count("111")
+    ]
+
+    keyAvg = [ round(abs(avg-x)/((avg+x)/2)*100, 3) for x in keyData ]
+
     print("Key Generation Counts:")
-    print("000: " + str(keys.count("000")))
-    print("001: " + str(keys.count("001")))
-    print("010: " + str(keys.count("010")))
-    print("011: " + str(keys.count("011")))
-    print("100: " + str(keys.count("100")))
-    print("101: " + str(keys.count("101")))
-    print("110: " + str(keys.count("110")))
-    print("111: " + str(keys.count("111")))
+    print("000: " + str(keyData[0]) + "  |  Avg. Deviation: " + str(abs(avg-keyData[0])) + "  |  Percent Deviation: " + str(keyAvg[0]) + "%")
+    print("001: " + str(keyData[1]) + "  |  Avg. Deviation: " + str(abs(avg-keyData[1])) + "  |  Percent Deviation: " + str(keyAvg[1]) + "%")
+    print("010: " + str(keyData[2]) + "  |  Avg. Deviation: " + str(abs(avg-keyData[2])) + "  |  Percent Deviation: " + str(keyAvg[2]) + "%")
+    print("011: " + str(keyData[3]) + "  |  Avg. Deviation: " + str(abs(avg-keyData[3])) + "  |  Percent Deviation: " + str(keyAvg[3]) + "%")
+    print("100: " + str(keyData[4]) + "  |  Avg. Deviation: " + str(abs(avg-keyData[4])) + "  |  Percent Deviation: " + str(keyAvg[4]) + "%")
+    print("101: " + str(keyData[5]) + "  |  Avg. Deviation: " + str(abs(avg-keyData[5])) + "  |  Percent Deviation: " + str(keyAvg[5]) + "%")
+    print("110: " + str(keyData[6]) + "  |  Avg. Deviation: " + str(abs(avg-keyData[6])) + "  |  Percent Deviation: " + str(keyAvg[6]) + "%")
+    print("111: " + str(keyData[7]) + "  |  Avg. Deviation: " + str(abs(avg-keyData[7])) + "  |  Percent Deviation: " + str(keyAvg[7]) + "%")
 
 
 def enctest():
     """
-    Create 1000 random 128-bit keys and plaintext examples, then measure the average time
+    Create 5000 random 128-bit keys and plaintext examples, then measure the average time
     that it takes to encrypt each example.
     """
     times = []
@@ -179,8 +196,7 @@ if __name__ == "__main__":
 
     key_parser.add_argument("length", help="Bit length of key", type=int, choices=range(1, 129),
                             metavar="{1-128}")
-    key_parser.add_argument("file", help="Output file (Optional. Default: \"./data/newkey.txt\")",
-                        nargs="?", default="./data/newkey.txt")
+    key_parser.add_argument("file", help="Output file")
 
     args = parser.parse_args()
 
